@@ -204,7 +204,7 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
+-- vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -239,6 +239,19 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+-- Remap kk/jj to <Esc> / <Esc> & :w
+vim.keymap.set('i', 'kk', '<Esc>`^')
+vim.keymap.set('i', 'jj', '<Esc>`^:w<CR>')
+vim.keymap.set('i', '<Esc>', '<nop>')
+
+-- Remap/fix accidental typos for write/write-quit/quit/quit-all
+vim.cmd('command! -nargs=* W w')
+vim.cmd('command! -nargs=* Wq wq')
+vim.cmd('command! -nargs=* WQ wq')
+vim.cmd('command! -nargs=* Q q')
+vim.cmd('command! -nargs=* Qa qa')
+vim.cmd('command! -nargs=* QA qa')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
