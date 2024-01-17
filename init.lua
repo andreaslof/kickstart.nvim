@@ -112,11 +112,19 @@ require('lazy').setup({
     },
   },
 
-  { -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
+  -- { -- Theme inspired by Atom
+  --   'navarasu/onedark.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     vim.cmd.colorscheme 'onedark'
+  --   end,
+  -- },
+  { -- Theme to use
+    'nyoom-engineering/oxocarbon.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      vim.opt.background = 'dark'
+      vim.cmd.colorscheme 'oxocarbon'
     end,
   },
 
@@ -125,12 +133,17 @@ require('lazy').setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'onedark',
+        icons_enabled = true,
+        theme = 'moonfly',
         component_separators = '|',
         section_separators = '',
       },
     },
+  },
+
+  { -- Use bufferline
+    'akinsho/bufferline.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
 
   { -- Add indentation guides even on blank lines
@@ -162,6 +175,11 @@ require('lazy').setup({
     end,
   },
 
+  { -- Add synchronized creation, deletion, renaming, and moving of files support to telescope
+    "nvim-telescope/telescope-file-browser.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+  },
+
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     dependencies = {
@@ -170,6 +188,27 @@ require('lazy').setup({
     config = function()
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
+  },
+
+  {
+    'rmagatti/auto-session',
+    config = function()
+      require("auto-session").setup {
+        log_level = "error",
+        auto_session_suppress_dirs = { "~/", "~/Projects", "~/Downloads", "/"},
+      }
+    end
+  },
+
+  {
+    'rmagatti/session-lens',
+    dependencies = {
+      'rmagatti/auto-session',
+      'nvim-telescope/telescope.nvim'
+    },
+    config = function()
+      require('session-lens').setup({--[[your custom config--]]})
+    end
   },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -199,7 +238,7 @@ vim.o.hlsearch = false
 vim.wo.number = true
 
 -- Enable mouse mode
-vim.o.mouse = 'a'
+vim.o.mouse = ''
 
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -240,10 +279,43 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+-- Disable arrow keys
+vim.keymap.set('n', '<Left>', ':echoe "Use h"<CR>')
+vim.keymap.set('n', '<Down>', ':echoe "Use j"<CR>')
+vim.keymap.set('n', '<Up>', ':echoe "Use k"<CR>')
+vim.keymap.set('n', '<Right>', ':echoe "Use l"<CR>')
+
+vim.keymap.set('v', '<Left>', ':echoe "Use h"<CR>')
+vim.keymap.set('v', '<Down>', ':echoe "Use j"<CR>')
+vim.keymap.set('v', '<Up>', ':echoe "Use k"<CR>')
+vim.keymap.set('v', '<Right>', ':echoe "Use l"<CR>')
+
+vim.keymap.set('i', '<Left>', '<Esc>:echoe "Use h"<CR>')
+vim.keymap.set('i', '<Down>', '<Esc>:echoe "Use j"<CR>')
+vim.keymap.set('i', '<Up>', '<Esc>:echoe "Use k"<CR>')
+vim.keymap.set('i', '<Right>', '<Esc>:echoe "Use l"<CR>')
+
 -- Remap kk/jj to <Esc> / <Esc> & :w
 vim.keymap.set('i', 'kk', '<Esc>`^')
 vim.keymap.set('i', 'jj', '<Esc>`^:w<CR>')
 vim.keymap.set('i', '<Esc>', '<nop>')
+
+-- Useful pane/window mappings
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
+
+-- Bind <leader>w to write files
+vim.keymap.set('n', '<leader>w', '<Esc>`^:w<CR>')
+
+-- Buffer mappings
+vim.keymap.set('n', '<leader>n', ':bn<CR>')
+vim.keymap.set('n', '<leader>m', ':bp<CR>')
+
+-- Split window actions
+vim.keymap.set('n', '<leader>-', ':sp<CR>')
+vim.keymap.set('n', '<leader>|', ':vsp<CR>')
 
 -- Remap/fix accidental typos for write/write-quit/quit/quit-all
 vim.cmd('command! -nargs=* W w')
@@ -264,9 +336,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   pattern = '*',
 })
 
+-- [[ Configure bufferline ]]
+-- See :help bufferline
+require('bufferline').setup {}
+
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
-require('telescope').setup {
+local telescope = require('telescope')
+local telescope_builtin = require('telescope.builtin')
+local fb_actions = telescope.extensions.file_browser.actions
+
+telescope.setup {
   defaults = {
     mappings = {
       i = {
@@ -278,30 +358,54 @@ require('telescope').setup {
 }
 
 -- Enable telescope fzf native, if installed
-pcall(require('telescope').load_extension, 'fzf')
+pcall(telescope.load_extension, 'fzf')
+
+-- Enable telescope file browser
+pcall(telescope.load_extension, 'file_browser')
+
+pcall(telescope.load_extension, 'session-lens')
 
 -- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = '[?] Find recently opened files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers, { desc = '[ ] Find existing buffers' })
+vim.keymap.set('n', '<leader>?', telescope_builtin.oldfiles, { desc = '[?] Find recently opened files' })
+vim.keymap.set('n', '<leader><space>', telescope_builtin.buffers, { desc = '[ ] Find existing buffers' })
 vim.keymap.set('n', '<leader>/', function()
   -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+  telescope_builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
     winblend = 10,
     previewer = false,
   })
 end, { desc = '[/] Fuzzily search in current buffer' })
 
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sf', telescope_builtin.find_files, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>sh', telescope_builtin.help_tags, { desc = '[S]earch [H]elp' })
+vim.keymap.set('n', '<leader>sw', telescope_builtin.grep_string, { desc = '[S]earch current [W]ord' })
+vim.keymap.set('n', '<leader>sg', telescope_builtin.live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sd', telescope_builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>fb', ':Telescope file_browser<CR>', { desc = '[F]ile [B]rowser' })
+vim.keymap.set('n', '<leader>cb', ':Telescope file_browser<CR> path=%:p:h select_buffer=true', { desc = 'Open at [C]urrent [B]uffer' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'typescript', 'help', 'vim' },
+  ensure_installed = {
+    'c',
+    'cpp',
+    'go',
+    'lua',
+    'python',
+    'rust',
+    'tsx',
+    'typescript',
+    'graphql',
+    'help',
+    'vim',
+    'hcl',
+    'terraform',
+    'markdown',
+    'yaml',
+    'bash'
+  },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = false,
@@ -390,15 +494,15 @@ local on_attach = function(_, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+  nmap('gr', telescope_builtin.lsp_references, '[G]oto [R]eferences')
   nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
   nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('<leader>ds', telescope_builtin.lsp_document_symbols, '[D]ocument [S]ymbols')
+  nmap('<leader>ws', telescope_builtin.lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('<leader>k', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -424,7 +528,9 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
-  -- tsserver = {},
+  tsserver = {},
+  terraformls = {},
+  tflint = {},
 
   lua_ls = {
     Lua = {
