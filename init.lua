@@ -189,12 +189,12 @@ require('lazy').setup({
     },
   },
 
-  {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
+  { -- Theme to use
+    'nyoom-engineering/oxocarbon.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      vim.opt.background = 'dark'
+      vim.cmd.colorscheme 'oxocarbon'
     end,
   },
 
@@ -204,8 +204,8 @@ require('lazy').setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'onedark',
+        icons_enabled = true,
+        theme = 'moonfly',
         component_separators = '|',
         section_separators = '',
       },
@@ -280,12 +280,12 @@ vim.o.hlsearch = false
 vim.wo.number = true
 
 -- Enable mouse mode
-vim.o.mouse = 'a'
+vim.o.mouse = ''
 
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
+-- vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -325,6 +325,52 @@ vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
+
+-- Disable arrow keys
+vim.keymap.set('n', '<Left>', ':echoe "Use h"<CR>')
+vim.keymap.set('n', '<Down>', ':echoe "Use j"<CR>')
+vim.keymap.set('n', '<Up>', ':echoe "Use k"<CR>')
+vim.keymap.set('n', '<Right>', ':echoe "Use l"<CR>')
+
+vim.keymap.set('v', '<Left>', ':echoe "Use h"<CR>')
+vim.keymap.set('v', '<Down>', ':echoe "Use j"<CR>')
+vim.keymap.set('v', '<Up>', ':echoe "Use k"<CR>')
+vim.keymap.set('v', '<Right>', ':echoe "Use l"<CR>')
+
+vim.keymap.set('i', '<Left>', '<Esc>:echoe "Use h"<CR>')
+vim.keymap.set('i', '<Down>', '<Esc>:echoe "Use j"<CR>')
+vim.keymap.set('i', '<Up>', '<Esc>:echoe "Use k"<CR>')
+vim.keymap.set('i', '<Right>', '<Esc>:echoe "Use l"<CR>')
+
+-- Remap kk/jj to <Esc> / <Esc> & :w
+vim.keymap.set('i', 'kk', '<Esc>`^')
+vim.keymap.set('i', 'jj', '<Esc>`^:w<CR>')
+vim.keymap.set('i', '<Esc>', '<nop>')
+
+-- Useful pane/window mappings
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
+
+-- Bind <leader>w to write files
+vim.keymap.set('n', '<leader>w', '<Esc>`^:w<CR>')
+
+-- Buffer mappings
+vim.keymap.set('n', '<leader>n', ':bn<CR>')
+vim.keymap.set('n', '<leader>m', ':bp<CR>')
+
+-- Split window actions
+vim.keymap.set('n', '<leader>-', ':sp<CR>')
+vim.keymap.set('n', '<leader>|', ':vsp<CR>')
+
+-- Remap/fix accidental typos for write/write-quit/quit/quit-all
+vim.cmd('command! -nargs=* W w')
+vim.cmd('command! -nargs=* Wq wq')
+vim.cmd('command! -nargs=* WQ wq')
+vim.cmd('command! -nargs=* Q q')
+vim.cmd('command! -nargs=* Qa qa')
+vim.cmd('command! -nargs=* QA qa')
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -423,7 +469,24 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+    ensure_installed = {
+    'c',
+    'cpp',
+    'go',
+    'lua',
+    'python',
+    'rust',
+    'tsx',
+    'typescript',
+    'graphql',
+    'help',
+    'vim',
+    'hcl',
+    'terraform',
+    'markdown',
+    'yaml',
+    'bash'
+  },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -661,6 +724,17 @@ cmp.setup {
     { name = 'path' },
   },
 }
+
+-- [[ Configure indent-blankline ]]
+require('ibl').setup({
+  indent = { char = '┊' },
+  whitespace = {
+    highlight = {
+      "Whitespace",
+      "NonText",
+    },
+  },
+})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
