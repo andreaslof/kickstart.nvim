@@ -189,13 +189,21 @@ require('lazy').setup({
     },
   },
 
-  { -- Theme to use
-    'nyoom-engineering/oxocarbon.nvim',
+  -- { -- Theme to use
+  --   'nyoom-engineering/oxocarbon.nvim',
+  --   priority = 1000,
+  --   config = function()
+  --     vim.opt.background = 'dark'
+  --     vim.cmd.colorscheme 'oxocarbon'
+  --   end,
+  -- },
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
     priority = 1000,
     config = function()
-      vim.opt.background = 'dark'
-      vim.cmd.colorscheme 'oxocarbon'
-    end,
+      vim.cmd.colorscheme 'catppuccin'
+    end
   },
 
   {
@@ -733,6 +741,20 @@ require('ibl').setup({
       "Whitespace",
       "NonText",
     },
+  },
+})
+
+-- [[ Configure theme ]]
+require('catppuccin').setup({
+  flavour = 'macchiato',
+  background = {
+    light = 'latte',
+    dark = 'macchiato',
+  },
+  dim_inactive = {
+    enabled = false,
+    shade = "dark",
+    percentage = 0.25,
   },
 })
 
