@@ -213,11 +213,16 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = true,
-        theme = 'moonfly',
+        theme = 'palenight',
         component_separators = '|',
         section_separators = '',
       },
     },
+  },
+
+  { -- Use bufferline
+    'akinsho/bufferline.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
 
   {
@@ -757,6 +762,9 @@ require('catppuccin').setup({
     percentage = 0.25,
   },
 })
+
+-- [[ Configure bufferline ]]
+require('bufferline').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
