@@ -492,7 +492,6 @@ vim.defer_fn(function()
     'tsx',
     'typescript',
     'graphql',
-    'help',
     'vim',
     'hcl',
     'terraform',
